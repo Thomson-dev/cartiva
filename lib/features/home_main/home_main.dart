@@ -1,5 +1,8 @@
 import 'package:cartiva/core/app_theme_color.dart';
+import 'package:cartiva/features/account/account_screen.dart';
+import 'package:cartiva/features/cart/cart_screen.dart';
 import 'package:cartiva/features/home/home_screen.dart';
+import 'package:cartiva/features/home/saved_items_screen.dart';
 import 'package:cartiva/features/search/search_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -17,9 +20,9 @@ class _HomeMainState extends State<HomeMain> {
   final List<Widget> _screen = [
     HomeScreen(),
     SearchScreen(),
-    Center(child: Text("Saved screen")),
-    Center(child: Text("Cart screen")),
-    Center(child: Text("Account screen")),
+    SavedItemsScreen(),
+    CartScreen(),
+    AccountScreen(),
   ];
 
   @override
@@ -32,6 +35,7 @@ class _HomeMainState extends State<HomeMain> {
       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
+        
         children: [
           BottomNavigationBar(
             currentIndex: _currentIndex,
@@ -43,7 +47,7 @@ class _HomeMainState extends State<HomeMain> {
             },
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
-            elevation: 0,
+            elevation: 5,
             selectedItemColor: AppColors.primary,
             unselectedItemColor: AppColors.secondary,
             showUnselectedLabels: true,

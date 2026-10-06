@@ -1,23 +1,30 @@
 import 'package:cartiva/features/home/model/productModel.dart';
+import 'package:cartiva/features/home/product_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductCard extends StatefulWidget {
+import '../provider/saved_products_provider.dart';
+
+class ProductCard extends ConsumerWidget {
   final Product product;
 
   const ProductCard({Key? key, required this.product}) : super(key: key);
 
   @override
-  _ProductCardState createState() => _ProductCardState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFavorite = ref.watch(savedProductsProvider).contains(product.id);
 
-class _ProductCardState extends State<ProductCard> {
-  bool _isFavorite = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(product: product),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         // Image with a floating favorite button — Stack is the right
         // widget for layering the heart button on top of the photo.
         AspectRatio(
@@ -27,7 +34,7 @@ class _ProductCardState extends State<ProductCard> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: Image.network(
-                  widget.product.imageUrl,
+                  product.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -42,13 +49,11 @@ class _ProductCardState extends State<ProductCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isFavorite = !_isFavorite;
-                      });
-                    },
+                    onPressed: () => ref
+                        .read(savedProductsProvider.notifier)
+                        .toggle(product.id),
                     icon: Icon(
-                      _isFavorite
+                      isFavorite
                           ? Icons.favorite
                           : Icons.favorite_border,
                       size: 18,
@@ -66,7 +71,7 @@ class _ProductCardState extends State<ProductCard> {
         ),
         const SizedBox(height: 10),
         Text(
-          widget.product.name,
+          product.name,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
         const SizedBox(height: 4),
@@ -75,13 +80,13 @@ class _ProductCardState extends State<ProductCard> {
         Row(
           children: [
             Text(
-              widget.product.price.toString(),
+              product.price.toString(),
               style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
             ),
-            if (widget.product.discount != null) ...[
+            if (product.discount != null) ...[
               const SizedBox(width: 6),
               Text(
-                widget.product.discount!,
+                product.discount!,
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w600,
@@ -91,7 +96,8 @@ class _ProductCardState extends State<ProductCard> {
             ],
           ],
         ),
-      ],
+        ],
+      ),
     );
   }
 }

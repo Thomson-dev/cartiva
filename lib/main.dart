@@ -1,5 +1,4 @@
-import 'package:cartiva/features/home_main/home_main.dart';
-import 'package:cartiva/features/auth/sign_in_screen.dart';
+import 'package:cartiva/features/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,11 +11,7 @@ Future<void> main() async {
     publishableKey: 'sb_publishable_9rZkM3dpEFYNJ7RD-Jygqg_jAIrGGv4',
   );
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,9 +30,7 @@ class MyApp extends StatelessWidget {
 
         colorScheme: .fromSeed(seedColor: Colors.white),
       ),
-      home: Supabase.instance.client.auth.currentSession == null
-          ? const SignIn()
-          : const HomeMain(),
+      home: const SplashScreen(),
     );
   }
 }

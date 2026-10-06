@@ -89,14 +89,22 @@ void main() {
         child: const MaterialApp(home: SignIn()),
       ),
     );
-    await tester.tap(find.text('Log In'));
+
+    expect(
+      tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+      isNull,
+    );
+    await tester.enterText(find.byType(TextFormField).first, 'invalid');
+    await tester.enterText(find.byType(TextFormField).last, '12345');
     await tester.pump();
     expect(find.text('Please enter your email address'), findsOneWidget);
-    expect(find.text('Please enter your password'), findsOneWidget);
-    expect(repository.calls, 0);
-    await tester.enterText(find.byType(TextFormField).first, 'invalid');
-    await tester.pump();
     expect(find.text('Please enter a valid email address'), findsOneWidget);
+    expect(find.text('Password must be at least 6 characters'), findsOneWidget);
+    expect(repository.calls, 0);
+    expect(
+      tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+      isNull,
+    );
     expect(
       tester.widget<TextField>(find.byType(TextField).last).obscureText,
       isTrue,
@@ -107,6 +115,51 @@ void main() {
       tester.widget<TextField>(find.byType(TextField).last).obscureText,
       isFalse,
     );
+  });
+
+  testWidgets('enables login only when credentials are valid', (tester) async {
+    final repository = FakeSignInRepository();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authRepositoryProvider.overrideWithValue(repository)],
+        child: const MaterialApp(home: SignIn()),
+      ),
+    );
+
+    final button = find.byType(ElevatedButton);
+    expect(tester.widget<ElevatedButton>(button).onPressed, isNull);
+
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'shopper@example.com',
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'secret');
+    await tester.pump();
+
+    expect(tester.widget<ElevatedButton>(button).onPressed, isNotNull);
+  });
+
+  testWidgets('does not submit a password shorter than six characters', (
+    tester,
+  ) async {
+    final repository = FakeSignInRepository();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authRepositoryProvider.overrideWithValue(repository)],
+        child: const MaterialApp(home: SignIn()),
+      ),
+    );
+
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'shopper@example.com',
+    );
+    await tester.enterText(find.byType(TextFormField).last, '12345');
+    await tester.tap(find.text('Log In'));
+    await tester.pump();
+
+    expect(find.text('Password must be at least 6 characters'), findsOneWidget);
+    expect(repository.calls, 0);
   });
 
   testWidgets('submits credentials once and allows retry after an error', (

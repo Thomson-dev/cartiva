@@ -226,6 +226,7 @@ class _SignUpScreenState extends ConsumerState<SignUp> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  autofocus: true,
                   textInputAction: TextInputAction.next,
                   onTapOutside: (_) {
                     FocusManager.instance.primaryFocus?.unfocus();
